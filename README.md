@@ -9,7 +9,7 @@ This work was carried out as part of a master's dissertation with [Vasileios Kou
 ## Installation
 
 ```
-go get -u github.com/sengleung/pifra/pifra
+go get -u github.com/basil-conto/pifra/pifra
 ```
 
 `go get` downloads the package and its dependencies to `$GOPATH/src` and creates an executable in `$GOPATH/bin`.
