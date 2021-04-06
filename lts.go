@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"container/list"
 	"fmt"
+	"reflect"
 	"sort"
 	"strconv"
 	"text/template"
@@ -506,4 +507,94 @@ func prettyPrintSymbol(symbol Symbol) string {
 		return strconv.Itoa(s) + " "
 	}
 	return ""
+}
+
+type State int
+type Block map[int]Configuration
+type Partition []Block
+
+func reachableBlocks(lts Lts, s int, a Label, p Partition) []int {
+	dests := []int{}
+	for _, t := range lts.Transitions {
+		if !(t.Source == s && t.Label == a) {
+			continue
+		}
+		for i, b := range p {
+			if _, ok := b[t.Destination]; ok {
+				dests = append(dests, i)
+			}
+		}
+	}
+	return dests
+}
+
+func split(lts Lts, b Block, a Label, p Partition) Partition {
+	var exists Configuration
+	var s int
+	b1 := make(Block)
+	b2 := make(Block)
+	for t := range b {
+		// Choose some state in b
+		if s == 0 {
+			s = t
+		}
+		sreach := reachableBlocks(lts, s, a, p)
+		treach := reachableBlocks(lts, t, a, p)
+		if reflect.DeepEqual(sreach, treach) {
+			b1[t] = exists
+		} else {
+			b2[t] = exists
+		}
+	}
+	if len(b2) == 0 {
+		return Partition{b1}
+	}
+	return Partition{b1, b2}
+}
+
+func diff(p Partition, i int) Partition {
+	last := len(p) - 1
+	p[i] = p[last]
+	return p[:last]
+}
+
+func find(p Partition, b Block) (int, bool) {
+	for i, pb := range p {
+		if reflect.DeepEqual(pb, b) {
+			return i, true
+		}
+	}
+	return -1, false
+}
+
+func PartKS(lts Lts) Partition {
+	p := Partition{lts.States}
+	actions := make(map[Label]struct{})
+	for _, trans := range lts.Transitions {
+		if _, ok := actions[trans.Label]; !ok {
+			actions[trans.Label] = struct{}{}
+		}
+	}
+	for changed := true; changed; {
+		changed = false
+		for i, b := range p {
+			bp := Partition{b}
+			for a := range actions {
+				// FIXME: Sort transitions first
+				// Use binary search?
+				bs := split(lts, b, a, p)
+				if reflect.DeepEqual(bs, bp) {
+					continue
+				}
+				p = diff(p, i)
+				for _, newb := range bs {
+					if _, ok := find(p, newb); !ok {
+						p = append(p, newb)
+					}
+				}
+				changed = true
+			}
+		}
+	}
+	return p
 }
