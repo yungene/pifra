@@ -567,34 +567,54 @@ func find(p Partition, b Block) (int, bool) {
 	return -1, false
 }
 
-func PartKS(lts Lts) Partition {
-	p := Partition{lts.States}
-	actions := make(map[Label]struct{})
-	for _, trans := range lts.Transitions {
-		if _, ok := actions[trans.Label]; !ok {
-			actions[trans.Label] = struct{}{}
+func uniquify(i int, lts Lts) {
+	off := 0
+	for state, conf := range lts.States {
+		delete(lts.States, state)
+		for ok := true; ok; {
+			off += 1000
+			_, ok = lts.States[state + i * off]
 		}
+		lts.States[state + i * off] = conf
 	}
-	for changed := true; changed; {
-		changed = false
-		for i, b := range p {
-			bp := Partition{b}
-			for a := range actions {
-				// FIXME: Sort transitions first
-				// Use binary search?
-				bs := split(lts, b, a, p)
-				if reflect.DeepEqual(bs, bp) {
-					continue
-				}
-				p = diff(p, i)
-				for _, newb := range bs {
-					if _, ok := find(p, newb); !ok {
-						p = append(p, newb)
-					}
-				}
-				changed = true
-			}
-		}
-	}
-	return p
 }
+
+func PartKS(ltses []Lts) Partition {
+	for i, lts := range ltses {
+		uniquify(i, lts)
+	}
+	fmt.Printf("%+v\n", ltses)
+	return nil
+}
+
+// func PartKS(lts Lts) Partition {
+// 	p := Partition{lts.States}
+// 	actions := make(map[Label]struct{})
+// 	for _, trans := range lts.Transitions {
+// 		if _, ok := actions[trans.Label]; !ok {
+// 			actions[trans.Label] = struct{}{}
+// 		}
+// 	}
+// 	for changed := true; changed; {
+// 		changed = false
+// 		for i, b := range p {
+// 			bp := Partition{b}
+// 			for a := range actions {
+// 				// FIXME: Sort transitions first
+// 				// Use binary search?
+// 				bs := split(lts, b, a, p)
+// 				if reflect.DeepEqual(bs, bp) {
+// 					continue
+// 				}
+// 				p = diff(p, i)
+// 				for _, newb := range bs {
+// 					if _, ok := find(p, newb); !ok {
+// 						p = append(p, newb)
+// 					}
+// 				}
+// 				changed = true
+// 			}
+// 		}
+// 	}
+// 	return p
+// }

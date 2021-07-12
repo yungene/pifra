@@ -17,7 +17,7 @@ type Flags struct {
 	MaxStates    int
 	DisableGC    bool
 
-	InputFile  string
+	InputFiles []string
 	OutputFile string
 
 	GVLayout       string
@@ -59,19 +59,34 @@ func OutputMode(flags Flags) error {
 	initFlags(flags)
 	gvLayout = flags.GVLayout
 
+	var inputs [][]byte
 	inputTimeStart := time.Now()
-	input, err := ioutil.ReadFile(flags.InputFile)
-	if err != nil {
-		return err
+	for _, file := range flags.InputFiles {
+		input, err := ioutil.ReadFile(file)
+		if err != nil {
+			return err
+		}
+		inputs = append(inputs, input)
 	}
 	inputTime := time.Since(inputTimeStart)
 
+	var ltses []Lts
 	programTimeStart := time.Now()
-	lts, err := generateLts(input)
-	if err != nil {
-		return err
+	for _, input := range inputs {
+		lts, err := generateLts(input)
+		if err != nil {
+			return err
+		}
+		ltses = append(ltses, lts)
 	}
 	programElapsed := time.Since(programTimeStart)
+
+	if len(ltses) > 1 {
+		fmt.Printf("%+v\n", PartKS(ltses))
+		return nil
+	}
+
+	lts := ltses[0]
 
 	var outputTime time.Duration
 
