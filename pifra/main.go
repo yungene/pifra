@@ -107,32 +107,6 @@ func init() {
 	rootCmd.PersistentFlags().BoolP("help", "h", false, "show this help message and exit")
 }
 
-func label(a int) pifra.Label {
-	var sym pifra.Symbol
-	sym.Value = a
-	return pifra.Label{Symbol: sym, Symbol2: sym}
-}
-
 func main() {
-	// execute()
-	var c pifra.Configuration
-	lts := pifra.Lts{
-		States:  map[int]pifra.Configuration{0: c, 1: c, 2: c, 10: c, 11: c},
-		Transitions: []pifra.Transition{
-			{Source: 0, Destination: 1, Label: label(4)},
-			{Source: 0, Destination: 2, Label: label(4)},
-			{Source: 1, Destination: 2, Label: label(5)},
-			{Source: 2, Destination: 2, Label: label(5)},
-			{Source: 10, Destination: 11, Label: label(4)},
-			{Source: 11, Destination: 11, Label: label(5)},
-			// {"s", "a", "s1"},
-			// {"s", "a", "s2"},
-			// {"s1", "b", "s2"},
-			// {"s2", "b", "s2"},
-			// {"t", "a", "t1"},
-			// {"t1", "b", "t1"},
-		},
-	}
-	fmt.Println(lts)
-	fmt.Println(pifra.PartKS(lts))
+	execute()
 }
