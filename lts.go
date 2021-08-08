@@ -216,7 +216,7 @@ func generateGraphVizFile(lts Lts, outputStateNo bool) []byte {
 	return output.Bytes()
 }
 
-func (l Label) prettyPrintGraph() string {
+func (l Label) PrettyPrintGraph() string {
 	return prettyPrintGraphLabel(l)
 }
 
