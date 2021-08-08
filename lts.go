@@ -130,15 +130,15 @@ func init() {
 // RegisterGobs registers concrete types implementing the Element interface for
 // encoding as binary gobs.
 func RegisterGobs() {
-	gob.Register(ElemNil{})
-	gob.Register(ElemOutput{})
-	gob.Register(ElemInput{})
-	gob.Register(ElemEquality{})
-	gob.Register(ElemRestriction{})
-	gob.Register(ElemSum{})
-	gob.Register(ElemParallel{})
-	gob.Register(ElemProcess{})
-	gob.Register(ElemRoot{})
+	gob.Register(&ElemNil{})
+	gob.Register(&ElemOutput{})
+	gob.Register(&ElemInput{})
+	gob.Register(&ElemEquality{})
+	gob.Register(&ElemRestriction{})
+	gob.Register(&ElemSum{})
+	gob.Register(&ElemParallel{})
+	gob.Register(&ElemProcess{})
+	gob.Register(&ElemRoot{})
 }
 
 func generateGobFile(lts Lts) []byte {
