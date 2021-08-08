@@ -3,7 +3,9 @@ package pifra
 import (
 	"bytes"
 	"container/list"
+	"encoding/gob"
 	"fmt"
+	stdlog "log"
 	"sort"
 	"strconv"
 	"text/template"
@@ -119,6 +121,34 @@ func explore(root Configuration) Lts {
 		StatesExplored:  statesExplored,
 		StatesGenerated: statesGenerated,
 	}
+}
+
+func init() {
+	RegisterGobs()
+}
+
+// RegisterGobs registers concrete types implementing the Element interface for
+// encoding as binary gobs.
+func RegisterGobs() {
+	gob.Register(ElemNil{})
+	gob.Register(ElemOutput{})
+	gob.Register(ElemInput{})
+	gob.Register(ElemEquality{})
+	gob.Register(ElemRestriction{})
+	gob.Register(ElemSum{})
+	gob.Register(ElemParallel{})
+	gob.Register(ElemProcess{})
+	gob.Register(ElemRoot{})
+}
+
+func generateGobFile(lts Lts) []byte {
+	var buf bytes.Buffer
+	enc := gob.NewEncoder(&buf)
+	err := enc.Encode(lts)
+	if err != nil {
+		stdlog.Fatal(err)
+	}
+	return buf.Bytes()
 }
 
 func generateGraphVizFile(lts Lts, outputStateNo bool) []byte {

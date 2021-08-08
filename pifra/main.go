@@ -97,6 +97,7 @@ func init() {
 	rootCmd.PersistentFlags().StringVarP(&flags.OutputFile, "output", "o", "", "output the LTS to a file (default format is the Graphviz DOT language)")
 	rootCmd.PersistentFlags().BoolVarP(&flags.GVTex, "output-tex", "t", false, "output the LTS file with LaTeX labels for use with dot2tex")
 	rootCmd.PersistentFlags().BoolVarP(&flags.Pretty, "output-pretty", "p", false, "output the LTS file in a pretty-printed format")
+	rootCmd.PersistentFlags().BoolVarP(&flags.Gob, "output-gob", "g", false, "output the LTS file in a binary gob encoding")
 
 	rootCmd.PersistentFlags().BoolVarP(&flags.GVOutputStates, "output-states", "s", false, "output state numbers instead of configurations for the Graphviz DOT file")
 	rootCmd.PersistentFlags().StringVarP(&flags.GVLayout, "output-layout", "l", "", "layout of the GraphViz DOT file, e.g., \"rankdir=TB; margin=0;\"")

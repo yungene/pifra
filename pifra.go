@@ -25,6 +25,7 @@ type Flags struct {
 	GVTex          bool
 
 	Pretty     bool
+	Gob        bool
 	Statistics bool
 
 	Quiet bool
@@ -88,6 +89,8 @@ func OutputMode(flags Flags) error {
 			var output []byte
 			if flags.Pretty {
 				output = generatePrettyLts(lts)
+			} else if flags.Gob {
+				output = generateGobFile(lts)
 			} else if flags.GVTex {
 				output = generateGraphVizTexFile(lts, flags.GVOutputStates)
 			} else {
