@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/basil-conto/pifra"
 	"github.com/spf13/cobra"
+	"github.com/yungene/pifra"
 )
 
 var flags pifra.Flags
