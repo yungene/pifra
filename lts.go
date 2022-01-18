@@ -19,6 +19,8 @@ type Lts struct {
 
 	StatesExplored  int
 	StatesGenerated int
+
+	FreeNamesMap map[string]string
 }
 
 type Transition struct {

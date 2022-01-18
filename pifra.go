@@ -132,7 +132,8 @@ func generateLts(input []byte) (Lts, error) {
 	if err != nil {
 		return Lts{}, err
 	}
-	root := newRootConf(proc)
+	root, namesMap := newRootConf(proc)
 	lts := explore(root)
+	lts.FreeNamesMap = namesMap
 	return lts, nil
 }

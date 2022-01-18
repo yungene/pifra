@@ -207,7 +207,7 @@ t    -> {(1,#1)} ¦- (0 | $&x_1.0)
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			proc, _ := InitProgram(tc.input)
-			root := newRootConf(proc)
+			root, _ := newRootConf(proc)
 			confs := trans(root)
 			var output bytes.Buffer
 			output.WriteString("\n")

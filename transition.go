@@ -118,7 +118,7 @@ func (reg *Registers) GetLabel(name string) int {
 	return -1
 }
 
-func newRootConf(process Element) Configuration {
+func newRootConf(process Element) (Configuration, map[string]string) {
 	fns := GetAllFreeNames(process)
 
 	for _, dp := range DeclaredProcs {
@@ -169,10 +169,14 @@ func newRootConf(process Element) Configuration {
 		regIndex++
 	}
 
+	// A map from new generic names to old original names.
+	namesMap := make(map[string]string)
 	// Initialise the registers with generated free names.
 	for i, name := range freshNames {
+		// Generate a new generic free name.
 		fn := fnPrefix + strconv.Itoa(i+1)
 		register[regIndex] = fn
+		namesMap[fn] = name
 
 		// Substitute the actual name with a generated free name.
 		subName(process, Name{
@@ -216,12 +220,13 @@ func newRootConf(process Element) Configuration {
 		regIndex++
 	}
 	return Configuration{
-		Process: process,
-		Registers: Registers{
-			Size:      registerSize,
-			Registers: register,
+			Process: process,
+			Registers: Registers{
+				Size:      registerSize,
+				Registers: register,
+			},
 		},
-	}
+		namesMap
 }
 
 var recVisitedProcs map[string]bool
