@@ -94,7 +94,7 @@ func OutputMode(flags Flags) error {
 			} else if flags.GVTex {
 				output = generateGraphVizTexFile(lts, flags.GVOutputStates)
 			} else {
-				output = generateGraphVizFile(lts, flags.GVOutputStates)
+				output = GenerateGraphVizFile(lts, flags.GVOutputStates)
 			}
 			outputTimeStart := time.Now()
 			if err := writeFile(output, flags.OutputFile); err != nil {

@@ -153,7 +153,7 @@ func generateGobFile(lts Lts) []byte {
 	return buf.Bytes()
 }
 
-func generateGraphVizFile(lts Lts, outputStateNo bool) []byte {
+func GenerateGraphVizFile(lts Lts, outputStateNo bool) []byte {
 	vertices := lts.States
 	edges := lts.Transitions
 
@@ -178,7 +178,7 @@ func generateGraphVizFile(lts Lts, outputStateNo bool) []byte {
 		if outputStateNo {
 			config = "s" + strconv.Itoa(id)
 		} else {
-			config = prettyPrintRegister(conf.Registers) + " ⊢\n" + PrettyPrintAst(conf.Process)
+			config = PrettyPrintRegister(conf.Registers) + " ⊢\n" + PrettyPrintAst(conf.Process)
 		}
 
 		var layout string
@@ -205,7 +205,7 @@ func generateGraphVizFile(lts Lts, outputStateNo bool) []byte {
 		edg := EdgeTemplate{
 			Source:      "s" + strconv.Itoa(edge.Source),
 			Destination: "s" + strconv.Itoa(edge.Destination),
-			Label:       prettyPrintGraphLabel(edge.Label),
+			Label:       PrettyPrintGraphLabel(edge.Label),
 		}
 		tmpl, _ := template.New("todos").Parse("    {{.Source}} -> {{.Destination}} [label=\"{{ .Label}}\"]\n")
 		tmpl.Execute(&buffer, edg)
@@ -219,17 +219,17 @@ func generateGraphVizFile(lts Lts, outputStateNo bool) []byte {
 }
 
 func (l Label) PrettyPrintGraph() string {
-	return prettyPrintGraphLabel(l)
+	return PrettyPrintGraphLabel(l)
 }
 
-func prettyPrintGraphLabel(label Label) string {
+func PrettyPrintGraphLabel(label Label) string {
 	if label.Symbol.Type == SymbolTypTau {
 		return "τ"
 	}
-	return prettyPrintGraphSymbol(label.Symbol) + prettyPrintGraphSymbol(label.Symbol2)
+	return PrettyPrintGraphSymbol(label.Symbol) + PrettyPrintGraphSymbol(label.Symbol2)
 }
 
-func prettyPrintGraphSymbol(symbol Symbol) string {
+func PrettyPrintGraphSymbol(symbol Symbol) string {
 	s := symbol.Value
 	switch symbol.Type {
 	case SymbolTypInput:
@@ -462,7 +462,7 @@ func generatePrettyLts(lts Lts) []byte {
 	}
 
 	rootString := "s0" + rootR + " = " +
-		prettyPrintRegister(root.Registers) + " |- " + PrettyPrintAst(root.Process)
+		PrettyPrintRegister(root.Registers) + " |- " + PrettyPrintAst(root.Process)
 	buffer.WriteString(rootString)
 
 	// Prevent extraneous new line if there are no edges.
@@ -481,8 +481,8 @@ func generatePrettyLts(lts Lts) []byte {
 			dstR = "+"
 		}
 		transString := "s" + strconv.Itoa(edge.Source) + srcR + "  " +
-			prettyPrintLabel(edge.Label) + "  s" + strconv.Itoa(edge.Destination) + dstR + " = " +
-			prettyPrintRegister(vertex.Registers) + " |- " + PrettyPrintAst(vertex.Process)
+			PrettyPrintLabel(edge.Label) + "  s" + strconv.Itoa(edge.Destination) + dstR + " = " +
+			PrettyPrintRegister(vertex.Registers) + " |- " + PrettyPrintAst(vertex.Process)
 		buffer.WriteString(transString)
 
 		// Prevent extraneous new line at last edge.
@@ -498,12 +498,12 @@ func generatePrettyLts(lts Lts) []byte {
 
 // PrettyPrintConfiguration returns a pretty printed string of the configuration.
 func PrettyPrintConfiguration(conf Configuration) string {
-	return prettyPrintLabel(conf.Label) + " -> " + prettyPrintRegister(conf.Registers) + " ¦- " +
+	return PrettyPrintLabel(conf.Label) + " -> " + PrettyPrintRegister(conf.Registers) + " ¦- " +
 		PrettyPrintAst(conf.Process)
 
 }
 
-func prettyPrintRegister(register Registers) string {
+func PrettyPrintRegister(register Registers) string {
 	str := "{"
 	labels := register.Labels()
 	reg := register.Registers
@@ -518,14 +518,14 @@ func prettyPrintRegister(register Registers) string {
 	return str + "}"
 }
 
-func prettyPrintLabel(label Label) string {
+func PrettyPrintLabel(label Label) string {
 	if label.Symbol.Type == SymbolTypTau {
 		return "t   "
 	}
-	return prettyPrintSymbol(label.Symbol) + prettyPrintSymbol(label.Symbol2)
+	return PrettyPrintSymbol(label.Symbol) + PrettyPrintSymbol(label.Symbol2)
 }
 
-func prettyPrintSymbol(symbol Symbol) string {
+func PrettyPrintSymbol(symbol Symbol) string {
 	s := symbol.Value
 	switch symbol.Type {
 	case SymbolTypInput:

@@ -28,7 +28,7 @@ func applyStructrualCongruence(conf Configuration) {
 }
 
 func getConfigurationKey(conf Configuration) string {
-	return prettyPrintRegister(conf.Registers) + PrettyPrintAst(conf.Process)
+	return PrettyPrintRegister(conf.Registers) + PrettyPrintAst(conf.Process)
 }
 
 func garbageCollection(conf Configuration) {
