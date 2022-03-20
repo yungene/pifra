@@ -68,6 +68,11 @@ func (reg *Registers) AddEmptyName() {
 		label := labels[i]
 		reg.Registers[label+1] = reg.GetName(label)
 	}
+	// Fix by Jevgenijus.
+	// The fix is needed for UpdateMax() to work correctly. As otherwise when
+	// handling restrictions, a call to UpdateMax() can overrise the non-empty
+	// register.
+	reg.Size = reg.Size + 1
 	delete(reg.Registers, 1)
 }
 
