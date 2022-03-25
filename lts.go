@@ -279,9 +279,9 @@ func generateGraphVizTexFile(lts Lts, outputStateNo bool) []byte {
 			config = "s_{" + strconv.Itoa(id) + "}"
 		} else {
 			config = `\begin{matrix} ` +
-				prettyPrintTexRegister(conf.Registers) +
+				PrettyPrintTexRegister(conf.Registers) +
 				` \vdash \\ ` +
-				prettyPrintTexAst(conf.Process) +
+				PrettyPrintTexAst(conf.Process) +
 				` \end{matrix}`
 		}
 
@@ -309,7 +309,7 @@ func generateGraphVizTexFile(lts Lts, outputStateNo bool) []byte {
 		edg := EdgeTemplate{
 			Source:      "s" + strconv.Itoa(edge.Source),
 			Destination: "s" + strconv.Itoa(edge.Destination),
-			Label:       prettyPrintTexGraphLabel(edge.Label),
+			Label:       PrettyPrintTexGraphLabel(edge.Label),
 		}
 		tmpl, _ := template.New("todos").Parse(
 			"    {{.Source}} -> {{.Destination}} [label=\"\",texlbl=\"${{.Label}}$\"]\n")
@@ -323,22 +323,22 @@ func generateGraphVizTexFile(lts Lts, outputStateNo bool) []byte {
 	return output.Bytes()
 }
 
-func prettyPrintTexRegister(register Registers) string {
+func PrettyPrintTexRegister(register Registers) string {
 	str := `\{`
 	labels := register.Labels()
 	reg := register.Registers
 
 	for i, label := range labels {
 		if i == len(labels)-1 {
-			str = str + "(" + strconv.Itoa(label) + "," + getTexName(reg[label]) + ")"
+			str = str + "(" + strconv.Itoa(label) + "," + GetTexName(reg[label]) + ")"
 		} else {
-			str = str + "(" + strconv.Itoa(label) + "," + getTexName(reg[label]) + "),"
+			str = str + "(" + strconv.Itoa(label) + "," + GetTexName(reg[label]) + "),"
 		}
 	}
 	return str + `\}`
 }
 
-func getTexName(name string) string {
+func GetTexName(name string) string {
 	if string(name[0]) == "#" {
 		return "a" + "_{" + name[1:] + "}"
 	}
@@ -352,11 +352,11 @@ func getTexName(name string) string {
 }
 
 // PrettyPrintAst returns a string containing the pi-calculus syntax of the AST.
-func prettyPrintTexAst(elem Element) string {
-	return prettyPrintTexAstAcc(elem, "")
+func PrettyPrintTexAst(elem Element) string {
+	return PrettyPrintTexAstAcc(elem, "")
 }
 
-func prettyPrintTexAstAcc(elem Element, str string) string {
+func PrettyPrintTexAstAcc(elem Element, str string) string {
 	elemTyp := elem.Type()
 	switch elemTyp {
 	case ElemTypNil:
@@ -364,37 +364,37 @@ func prettyPrintTexAstAcc(elem Element, str string) string {
 	case ElemTypOutput:
 		outElem := elem.(*ElemOutput)
 		str += fmt.Sprintf(`\bar{%s} \langle %s \rangle . `,
-			getTexName(outElem.Channel.Name), getTexName(outElem.Output.Name))
-		return prettyPrintTexAstAcc(outElem.Next, str)
+			GetTexName(outElem.Channel.Name), GetTexName(outElem.Output.Name))
+		return PrettyPrintTexAstAcc(outElem.Next, str)
 	case ElemTypInput:
 		inpElem := elem.(*ElemInput)
 		str += fmt.Sprintf(`%s ( %s ) . `,
-			getTexName(inpElem.Channel.Name), getTexName(inpElem.Input.Name))
-		return prettyPrintTexAstAcc(inpElem.Next, str)
+			GetTexName(inpElem.Channel.Name), GetTexName(inpElem.Input.Name))
+		return PrettyPrintTexAstAcc(inpElem.Next, str)
 	case ElemTypMatch:
 		matchElem := elem.(*ElemEquality)
 		if matchElem.Inequality {
 			str += fmt.Sprintf(`\lbrack %s \neq %s \rbrack . `,
-				getTexName(matchElem.NameL.Name), getTexName(matchElem.NameR.Name))
+				GetTexName(matchElem.NameL.Name), GetTexName(matchElem.NameR.Name))
 		} else {
 			str += fmt.Sprintf(`\lbrack %s = %s \rbrack . `,
-				getTexName(matchElem.NameL.Name), getTexName(matchElem.NameR.Name))
+				GetTexName(matchElem.NameL.Name), GetTexName(matchElem.NameR.Name))
 		}
-		return prettyPrintTexAstAcc(matchElem.Next, str)
+		return PrettyPrintTexAstAcc(matchElem.Next, str)
 	case ElemTypRestriction:
 		resElem := elem.(*ElemRestriction)
 		str += fmt.Sprintf(`\nu %s . `,
-			getTexName(resElem.Restrict.Name))
-		return prettyPrintTexAstAcc(resElem.Next, str)
+			GetTexName(resElem.Restrict.Name))
+		return PrettyPrintTexAstAcc(resElem.Next, str)
 	case ElemTypSum:
 		sumElem := elem.(*ElemSum)
-		left := prettyPrintTexAstAcc(sumElem.ProcessL, "")
-		right := prettyPrintTexAstAcc(sumElem.ProcessR, "")
+		left := PrettyPrintTexAstAcc(sumElem.ProcessL, "")
+		right := PrettyPrintTexAstAcc(sumElem.ProcessR, "")
 		str += fmt.Sprintf(`( %s + %s )`, left, right)
 	case ElemTypParallel:
 		parElem := elem.(*ElemParallel)
-		left := prettyPrintTexAstAcc(parElem.ProcessL, "")
-		right := prettyPrintTexAstAcc(parElem.ProcessR, "")
+		left := PrettyPrintTexAstAcc(parElem.ProcessL, "")
+		right := PrettyPrintTexAstAcc(parElem.ProcessR, "")
 		str += fmt.Sprintf(`( %s \mid %s )`, left, right)
 	case ElemTypProcess:
 		pcsElem := elem.(*ElemProcess)
@@ -404,28 +404,28 @@ func prettyPrintTexAstAcc(elem Element, str string) string {
 			params := "("
 			for i, param := range pcsElem.Parameters {
 				if i == len(pcsElem.Parameters)-1 {
-					params = params + getTexName(param.Name) + ")"
+					params = params + GetTexName(param.Name) + ")"
 				} else {
-					params = params + getTexName(param.Name) + ", "
+					params = params + GetTexName(param.Name) + ", "
 				}
 			}
 			str = str + pcsElem.Name + params
 		}
 	case ElemTypRoot:
 		rootElem := elem.(*ElemRoot)
-		return prettyPrintTexAstAcc(rootElem.Next, str)
+		return PrettyPrintTexAstAcc(rootElem.Next, str)
 	}
 	return str
 }
 
-func prettyPrintTexGraphLabel(label Label) string {
+func PrettyPrintTexGraphLabel(label Label) string {
 	if label.Symbol.Type == SymbolTypTau {
 		return `\tau`
 	}
-	return prettyPrintTexGraphSymbol(label.Symbol) + ` \, ` + prettyPrintTexGraphSymbol(label.Symbol2)
+	return PrettyPrintTexGraphSymbol(label.Symbol) + ` \, ` + PrettyPrintTexGraphSymbol(label.Symbol2)
 }
 
-func prettyPrintTexGraphSymbol(symbol Symbol) string {
+func PrettyPrintTexGraphSymbol(symbol Symbol) string {
 	s := symbol.Value
 	switch symbol.Type {
 	case SymbolTypInput:
